@@ -1,7 +1,9 @@
 package com.booking.controller;
 
 import com.booking.Service.BookingService;
+import com.booking.model.ApiResponse;
 import com.booking.model.BookingRequest;
+import com.booking.model.ReceiptDetail;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +18,8 @@ public class TicketBookingController {
     private BookingService bookingService;
 
     @PostMapping("/newBooking")
-    public ResponseEntity<String> bookTicket(@RequestBody BookingRequest bookingRequest){
-        bookingService.bookNewTicket(bookingRequest);
-        return new ResponseEntity<>("Ticket Booked successfully", HttpStatus.OK);
+    public ResponseEntity<ApiResponse<ReceiptDetail>> bookTicket(@RequestBody BookingRequest bookingRequest){
+        return new ResponseEntity<>(bookingService.bookNewTicket(bookingRequest), HttpStatus.OK);
     }
 
 }

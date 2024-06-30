@@ -16,11 +16,11 @@ public interface BookingValidator extends Function<Ticket, ErrorConstant> {
     }
 
     static BookingValidator isFromValid(){
-        return bookingRequest -> StringUtils.isBlank(bookingRequest.getFrom()) ? ErrorConstant.BAD_REQUEST_EMPTY_FROM : null;
+        return bookingRequest -> StringUtils.isBlank(bookingRequest.getSource()) ? ErrorConstant.BAD_REQUEST_EMPTY_FROM : null;
     }
 
     static BookingValidator isToValid(){
-        return bookingRequest -> StringUtils.isBlank(bookingRequest.getTo()) ? ErrorConstant.BAD_REQUEST_EMPTY_TO : null;
+        return bookingRequest -> StringUtils.isBlank(bookingRequest.getDestination()) ? ErrorConstant.BAD_REQUEST_EMPTY_TO : null;
     }
 
     static BookingValidator isPaymentModeValid(){

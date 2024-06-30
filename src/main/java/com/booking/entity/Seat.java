@@ -2,10 +2,7 @@ package com.booking.entity;
 
 
 import com.booking.model.enums.SectionType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -13,8 +10,11 @@ import lombok.Data;
 public class Seat {
 
     @Id
-    private Long seatNumber;
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    private long id;
+    private int seatNumber;
+    @Enumerated(EnumType.STRING)
     private SectionType sectionType;
-    private boolean isAvailable = true;
+    private boolean available = true;
 
 }

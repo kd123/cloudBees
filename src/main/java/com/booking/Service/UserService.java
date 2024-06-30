@@ -7,4 +7,6 @@ import org.springframework.stereotype.Service;
 public interface UserService {
 
     public User createUserEntry(UserDetails userDetails);
+    public User getUserByUserId(long userId);
+    public void removeUserFromTrain(long userId);
 }

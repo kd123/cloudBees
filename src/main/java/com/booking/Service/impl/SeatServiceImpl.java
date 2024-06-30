@@ -4,21 +4,22 @@ import com.booking.Service.SeatService;
 import com.booking.entity.Seat;
 import com.booking.model.enums.SectionType;
 import com.booking.repository.SeatRepository;
+import com.booking.util.TicketBookingUtil;
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 
-import static java.util.stream.Collectors.toList;
-
+@Service
+@Slf4j
 public class SeatServiceImpl implements SeatService {
 
-    private static final Logger log = LoggerFactory.getLogger(SeatServiceImpl.class);
     private static final long MAX_SEAT = 100;
     @Autowired
     SeatRepository seatRepository;
@@ -29,34 +30,47 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    public List<Long> allocateSeat(int numberOfSeat, SectionType sectionType) {
+    public String allocateSeat(int numberOfSeat, SectionType sectionType) {
         Optional<List<Seat>> optionalSeats = seatRepository.findBySectionTypeAndIsAvailableTrue(numberOfSeat, sectionType);
         List<Seat> seatList= new ArrayList<>();
         optionalSeats.ifPresent(seatList::addAll);
-        return seatList.stream().map(Seat::getSeatNumber).collect(toList());
+        return StringUtils.join(seatList,",");
     }
 
     @Override
-    public void modifySeats(List<Long> seatList, SectionType sectionType) {
+    public void modifySeats(List<Integer> seatList, SectionType sectionType) {
         seatList.forEach(seatNumber->seatRepository.updateSeatBySeatNumberAndSectionType(seatNumber,sectionType));
         log.info("Seat Number got updated Successfully");
     }
 
     private void initializeSeats(){
-        List<Seat> sectionAlist = Stream.iterate(1, i -> i + 1).map(k->generateSeatObject(k,SectionType.SECTION_A))
+        List<Seat> sectionAlist = Stream.iterate(1, i -> i + 1).map(k->generateSeatObject(k,SectionType.A))
                 .limit(MAX_SEAT).toList();
-        List<Seat>sectionBlist = Stream.iterate(1, i -> i + 1).map(k->generateSeatObject(k,SectionType.SECTION_B))
+        List<Seat>sectionBlist = Stream.iterate(1, i -> i + 1).map(k->generateSeatObject(k,SectionType.B))
                 .limit(MAX_SEAT).toList();
         List<Seat>list = Stream.concat(sectionAlist.stream(),sectionBlist.stream()).toList();
         seatRepository.saveAll(list);
 
     }
 
-    private Seat generateSeatObject(long seatNumber, SectionType sectionType){
+    private Seat generateSeatObject(int seatNumber, SectionType sectionType){
+        log.info("Seat Number {} ============================== ", seatNumber);
         Seat seat = new Seat();
         seat.setSeatNumber(seatNumber);
         seat.setSectionType(sectionType);
         seat.setAvailable(true);
         return seat;
+    }
+
+    @Override
+    public List<Integer> getSeatsBySeatNumbers(String seat, SectionType sectionType){
+        List<Integer> seats = new ArrayList<>();
+        Optional<List<Seat>> optionalSeats = seatRepository.findBySectionTypeAndSeatNumbers(
+                TicketBookingUtil.convertCommaSeparatedStringToArrayList(seat), sectionType );
+        optionalSeats.ifPresent(seatList -> seatList.stream()
+                .filter(Seat::isAvailable)
+                .map(s->seats.add(s.getSeatNumber())));
+        return seats;
+
     }
 }

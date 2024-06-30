@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "UserData")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     @Id

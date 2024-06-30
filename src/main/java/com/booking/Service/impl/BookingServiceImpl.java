@@ -8,22 +8,23 @@ import com.booking.constants.ErrorConstant;
 import com.booking.converter.BookingRequestToBookingDetailConverter;
 import com.booking.entity.Ticket;
 import com.booking.entity.User;
+import com.booking.exception.DataNotFoundException;
 import com.booking.exception.InvalidRequestException;
 import com.booking.model.ApiResponse;
 import com.booking.model.BookingRequest;
 import com.booking.model.ReceiptDetail;
 import com.booking.model.UserDetails;
 import com.booking.repository.TicketRepository;
+import com.booking.util.TicketBookingUtil;
 import com.booking.validator.BookingValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+
+import static org.apache.logging.log4j.util.Strings.EMPTY;
 
 @Service
 @Slf4j
@@ -78,13 +79,37 @@ public class BookingServiceImpl implements BookingService {
 
     private Ticket bookTicket(Ticket bookingDetail){
         bookingDetail.setPricePaid(bookingDetail.getNumberOfTicket()*price);
-        List<Long> allocatedSeats = new ArrayList<>();
+        String allocatedSeats = EMPTY;
         allocatedSeats = seatService.allocateSeat(bookingDetail.getNumberOfTicket(), bookingDetail.getSectionType());
         bookingDetail.setAllocatedSeats(allocatedSeats);
         bookingDetail = bookingRepository.save(bookingDetail);
-        seatService.modifySeats(allocatedSeats,bookingDetail.getSectionType());
+        seatService.modifySeats(TicketBookingUtil.convertCommaSeparatedStringToArrayList(allocatedSeats),bookingDetail.getSectionType());
         log.info("Ticket Booked successfully with ticketId and SeatNumber {},{}", bookingDetail.getId(),allocatedSeats);
         return bookingDetail;
 
+    }
+
+    @Override
+    public void deleteTicketByUserId(long userId){
+        try {
+            bookingRepository.deleteByUserId(userId);
+            log.info("ticket got deleted for userId {}", userId);
+        }catch (Exception e){
+            log.error("error while deleting ticket for userId {}", userId);
+            throw new InvalidRequestException(ErrorConstant.BAD_REQUEST_INVALID_DATA.getErrorCode(),
+                    ErrorConstant.BAD_REQUEST_INVALID_BOOKING_ID.getErrorMessage());
+        }
+    }
+
+    @Override
+    public Ticket getBookingDetailByUserId(long userId){
+        Ticket bookingDetail = null;
+        try {
+            bookingDetail = bookingRepository.findByUserId(userId).stream().filter(Objects::nonNull).toList().get(0);
+            return bookingDetail;
+        }catch (Exception e){
+            throw new DataNotFoundException(ErrorConstant.DATA_NOT_FOUND.getErrorCode(),
+                    ErrorConstant.DATA_NOT_FOUND.getErrorMessage());
+        }
     }
 }

@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface SeatService {
 
-    List<Long> allocateSeat(int numberOfSeat, SectionType sectionType);
-    void modifySeats(List<Long> seatList,SectionType sectionType);
+    String allocateSeat(int numberOfSeat, SectionType sectionType);
+    void modifySeats(List<Integer> seatList,SectionType sectionType);
+
+    List<Integer> getSeatsBySeatNumbers(String seat, SectionType sectionType);
 }

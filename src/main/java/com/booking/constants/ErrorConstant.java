@@ -15,6 +15,7 @@ public enum ErrorConstant {
     BAD_REQUEST_EMPTY_EMAIL("BK_400_9"," Email cannot be empty"),
     BAD_REQUEST_EMPTY_FROM("BK_400_10","From cannot be empty"),
     BAD_REQUEST_EMPTY_TO("BK_400_11"," To cannot be empty"),
+    DATA_NOT_FOUND("BK_404_1"," Data not Found"),
     BAD_REQUEST_EMPTY_SECTION_TYPE("BK_400_12"," Section Type cannot be empty");
     ;
 

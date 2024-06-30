@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -25,5 +27,11 @@ public class BookingServiceImplTest {
         doNothing().when(bookingRepository).deleteByUserId(anyLong());
         bookingService.deleteTicketByUserId(anyLong());
         verify(bookingRepository, times(1)).deleteByUserId(anyLong());
+    }
+
+    @Test
+    public void getBookingDetailByUserIdTest(){
+        //bookingService.getBookingDetailByUserId(anyLong());
+        assertNull(bookingService.getBookingDetailByUserId(anyLong()));
     }
 }

@@ -97,6 +97,10 @@ public class BookingDashBoardServiceImpl implements BookingDashBoardService {
         Ticket bookingDetail = null;
         try {
             bookingDetail = bookingService.getBookingDetailByUserId(userId);
+            if(Objects.isNull(bookingDetail)){
+                throw new DataNotFoundException(ErrorConstant.DATA_NOT_FOUND.getErrorCode(),
+                        ErrorConstant.DATA_NOT_FOUND.getErrorMessage());
+            }
             List<Integer> availableSeatBySeatNumbers = seatService.getSeatsBySeatNumbers(seats,bookingDetail.getSectionType());
             if(availableSeatBySeatNumbers.size()
                     !=
@@ -117,9 +121,9 @@ public class BookingDashBoardServiceImpl implements BookingDashBoardService {
             response.buildSuccessResponse(HttpStatus.OK.value(), "User seat updated for userId ", userSeatDetails);
             return response;
 
-        }catch (InvalidRequestException ie){
-            throw ie;
-        }catch (Exception e){
+        }catch (DataNotFoundException | InvalidRequestException de){
+            throw de;
+        } catch (Exception e){
             log.error("error while modifying ticket for userId and seats {} => {} ",userId,seats);
             throw new InvalidRequestException(ErrorConstant.BAD_REQUEST_INVALID_INPUT.getErrorCode(),
                     ErrorConstant.BAD_REQUEST_INVALID_INPUT.getErrorMessage());

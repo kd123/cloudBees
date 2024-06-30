@@ -21,7 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
@@ -103,10 +105,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Ticket getBookingDetailByUserId(long userId){
-        Ticket bookingDetail = null;
         try {
-            bookingDetail = bookingRepository.findByUserId(userId).stream().filter(Objects::nonNull).toList().get(0);
-            return bookingDetail;
+            List<Ticket> ticketList = bookingRepository.findByUserId(userId);
+            if(CollectionUtils.isEmpty(ticketList)){
+                return null;
+            }
+            return ticketList.get(0);
         }catch (Exception e){
             throw new DataNotFoundException(ErrorConstant.DATA_NOT_FOUND.getErrorCode(),
                     ErrorConstant.DATA_NOT_FOUND.getErrorMessage());

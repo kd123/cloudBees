@@ -40,13 +40,13 @@ public class UserServiceImpl implements UserService {
                 throw new InvalidRequestException(errorConstant.getErrorCode(),errorConstant.getErrorMessage());
             }
              user = userRepository.findByEmail(userDetails.getEmail());
-            if(Objects.nonNull(user.getId())){
-                log.info("User is already Exists with userId {}", user.getId());
+            if(Objects.nonNull(user)){
+                log.info("User is already Exists with user {}", user);
                 return user;
             }
             user = userConverter.convert(userDetails,null);
             user = userRepository.save(user);
-            log.info("User create with UserId {}", user.getId());
+            log.info("User create with User {}", user);
             return user;
         }catch (Exception e){
             log.error("An error occurred while creating user data of userEmail {}", userDetails.getEmail());
